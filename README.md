@@ -60,9 +60,23 @@ kann der folgende Code:
 angepasst werden um für einzelen oder alle Accounts das Passwort neu zu setzen.
 Das kannn dann z.B. für eine Migration mit ImapSync (siehe: https://imapsync.lamiral.info/ ) genutzt werden.
 
-# Fragen? Anregungen?
+## Fragen? Anregungen?
 
 Bitte benutze Github Issues:
  https://github.com/ADFC-Hamburg/domain-factory-mail-scraper/issues/new
 
 Code Änderungen gerne als Merge-Request.
+
+
+## Was der Community zurück geben?
+
+Wir würden uns sehr freuen, wenn dir das Script etwas gebracht hast, wenn du dem ADFC Hamburg eine Spende überweisen möchtest.
+
+Details dazu:
+
+https://hamburg.adfc.de/spende
+
+Gib gerne das Stichwort: **df-mail-scraper** an.
+
+Spenden sind steuerlich absetzbar. Für kommerziellen Einstatz empfehlen wir eine Spende von 0,50 Euro pro Mailbox oder mehr.
+
