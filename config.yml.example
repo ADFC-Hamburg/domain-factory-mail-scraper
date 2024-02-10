@@ -1,3 +1,5 @@
 username: info@FIXME.de
 password: super_geheim
 new_password: neues_geheimesPassw0rt
+change_pw: no
+change_pw_domain: example.com

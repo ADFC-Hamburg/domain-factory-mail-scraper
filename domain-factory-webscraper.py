@@ -9,7 +9,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import yaml
 from pathlib import Path
-import sys
 import json
 
 OK_CHAR = u'\u2713'
@@ -21,7 +20,7 @@ def login(driver: WebDriver, username: str, password: str):
     sleep(1)
     aktion = driver.find_element(By.LINK_TEXT, 'Kundenmenü')
     aktion.click()
-    sleep(1)
+    sleep(2)
     username_field = driver.find_element(By.XPATH, '//*[@id="1"]')
     username_field.send_keys(username)
     password_field = driver.find_element(By.XPATH, '//*[@id="2"]')
@@ -50,7 +49,7 @@ def analyse_email_mainpage(driver: WebDriver):
             addr = row.find_element(
                 By.XPATH, './td[1]/table/tbody/tr/td[2]/span').get_attribute('data-title').strip()
         if '<small>' in addr:
-            alt_addr = addr.split('<small>')[1].replace('</small>', '')
+            alt_addr = addr.split('<small>')[1].replace('</small>', '').strip(' \n\t')
             addr = addr.split('<br>')[0]
         size_str = row.find_element(
             By.XPATH, './td[11]').get_attribute('innerHTML').strip().replace(' MB', '')
@@ -76,7 +75,7 @@ def analyse_email_mainpage(driver: WebDriver):
             else:
                 destinations.append(row12)
         user.append({
-            'email': addr,
+            'email': addr.strip(' \n\t'),
             'alt_email': alt_addr,
             'autoresponder': autoresponder,
             'mailfilter': (row.find_element(By.XPATH, './td[5]/img').get_attribute('alt') == OK_CHAR),
@@ -93,7 +92,7 @@ def reset_password(driver: WebDriver, url, new_password: str):
     driver.get(url)
     #with open('reset_pw.html', 'w') as f:
     #    f.write(driver.page_source)
-    sleep(1)
+    sleep(2)
     checkbox = driver.find_element(By.ID, 'checkboxKeepOldPassword')
     checkbox.click()
     driver.find_element(By.ID, 'newPassword1hidden').send_keys(new_password)
@@ -108,14 +107,20 @@ def main():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     login(driver, conf['username'], conf['password'])
     sleep(5)
+    print(conf['change_pw'])
     mail_users = analyse_email_mainpage(driver)
     with open('email.json', 'w') as f:
         f.write(json.dumps(mail_users, indent=2))
     for mail_user in mail_users:
-        if mail_user['email'] == 'FIXME' and mail_user['mailbox']:
-            reset_password(driver, mail_user['url'], conf['new_password'])
+        if mail_user['email'].endswith('@'+conf['change_pw_domain']) and mail_user['mailbox'] and conf['change_pw']:
+            print("Change PW: %s" % mail_user['email'])
+            lockfile='/tmp/_df_%s.lock' % mail_user['email']
+            if Path(lockfile).is_file():
+                print('Skipping lockfile exists')
+            else:
+                reset_password(driver, mail_user['url'], conf['new_password'])
+                Path(lockfile).touch()
     driver.quit()
     # Login ist möglich unter https://admin.df.eu/kunde/index.php?into=appsuite
-
 
 main()
